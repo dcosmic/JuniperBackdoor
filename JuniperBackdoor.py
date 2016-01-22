@@ -12,7 +12,7 @@ user = "root"
 passwd = "<<< %s(un='%s') = %u"
 
 API_URL = "https://www.censys.io/api/v1"
-UID = "YOUR UID"
+API_ID = "YOUR API ID"
 SECRET = "YOUR SECRET"
 
 PAGES = 50
@@ -82,7 +82,7 @@ def getIp(query, page):
     try:
         res = requests.post(
             API_URL + "/search/ipv4", data=json.dumps(data), auth=(
-                UID, SECRET))
+                API_ID, SECRET))
     except:
         pass
     else:
